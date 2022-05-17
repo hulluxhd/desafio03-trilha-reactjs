@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { MdAddShoppingCart } from 'react-icons/md';
+import React, { useState, useEffect } from "react";
+import { MdAddShoppingCart } from "react-icons/md";
 
-import { ProductList } from './styles';
-import { api } from '../../services/api';
-import { formatPrice } from '../../util/format';
-import { useCart } from '../../hooks/useCart';
+import { ProductList } from "./styles";
+import { api } from "../../services/api";
+import { formatPrice } from "../../util/format";
+import { useCart } from "../../hooks/useCart";
 
 interface Product {
   id: number;
@@ -22,35 +22,51 @@ interface CartItemsAmount {
 }
 
 const Home = (): JSX.Element => {
-  // const [products, setProducts] = useState<ProductFormatted[]>([]);
+  const [products, setProducts] = useState<ProductFormatted[]>([]);
   // const { addProduct, cart } = useCart();
 
   // const cartItemsAmount = cart.reduce((sumAmount, product) => {
   //   // TODO
   // }, {} as CartItemsAmount)
 
+  function priceFormatter(obj: ProductFormatted) {
+    const fAmount = new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(obj.price);
+    return fAmount
+  }
+
   useEffect(() => {
     async function loadProducts() {
-      // TODO
+      const { data } = await api.get("/products");
+      setProducts(data)
     }
-
+    
     loadProducts();
+
+    
   }, []);
 
   function handleAddProduct(id: number) {
+
     // TODO
   }
 
   return (
     <ProductList>
-      <li>
-        <img src="https://rocketseat-cdn.s3-sa-east-1.amazonaws.com/modulo-redux/tenis1.jpg" alt="Tênis de Caminhada Leve Confortável" />
-        <strong>Tênis de Caminhada Leve Confortável</strong>
-        <span>R$ 179,90</span>
+      {products.map(product => (
+        <li key={product.id}>
+        <img
+          src={product.image}
+          alt={product.title}
+        />
+        <strong>{product.title}</strong>
+        <span>{priceFormatter(product)}</span>
         <button
           type="button"
           data-testid="add-product-button"
-        // onClick={() => handleAddProduct(product.id)}
+          // onClick={() => handleAddProduct(product.id)}
         >
           <div data-testid="cart-product-quantity">
             <MdAddShoppingCart size={16} color="#FFF" />
@@ -60,6 +76,7 @@ const Home = (): JSX.Element => {
           <span>ADICIONAR AO CARRINHO</span>
         </button>
       </li>
+      ))}
     </ProductList>
   );
 };
